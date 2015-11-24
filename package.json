@@ -1,7 +1,7 @@
 {
 	"name": "phpmd",
 	"description": "VS Code extension for php, using phpmd.",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"publisher": "linyang95",
 	"engines": {
 		"vscode": "^0.10.1"

@@ -1,7 +1,7 @@
 {
 	"name": "phpmd",
 	"description": "VS Code extension for php, using phpmd.",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"publisher": "linyang95",
 	"engines": {
 		"vscode": "^0.10.1"
@@ -10,7 +10,9 @@
 		"Linters",
 		"Languages"
 	],
-	"activationEvents": ["onLanguage:php"],
+	"activationEvents": [
+		"onLanguage:php"
+	],
 	"main": "./out/src/extension",
 	"contributes": {
 		"configuration": {
@@ -27,12 +29,17 @@
 					"default": null,
 					"description": "Points to the phpmd exectuable."
 				},
-				"phpmd.validate.run": {
+				"phpmd.validate.rulesets": {
 					"type": "string",
-					"enum": ["onSave", "onType"],
-					"default": "onSave",
-					"description": "Whether the linter is run on save or on type."
+					"default": null,
+					"description": "a comma-separated string of rulesetfilenames (cleancode,codesize,controversial,design,naming,unusedcode)"
 				}
+				// "phpmd.validate.run": {
+				// 	"type": "string",
+				// 	"enum": ["onSave", "onType"],
+				// 	"default": "onSave",
+				// 	"description": "Whether the linter is run on save or on type."
+				// }
 			}
 		}
 	},

@@ -10,7 +10,9 @@
 		"Linters",
 		"Languages"
 	],
-	"activationEvents": ["onLanguage:php"],
+	"activationEvents": [
+		"onLanguage:php"
+	],
 	"main": "./out/src/extension",
 	"contributes": {
 		"configuration": {
@@ -26,6 +28,11 @@
 					"type": "string",
 					"default": null,
 					"description": "Points to the phpmd exectuable."
+				},
+				"phpmd.validate.rulesets": {
+					"type": "string",
+					"default": null,
+					"description": "a comma-separated string of rulesetfilenames (cleancode,codesize,controversial,design,naming,unusedcode)"
 				}
 				// "phpmd.validate.run": {
 				// 	"type": "string",

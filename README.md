@@ -2,6 +2,12 @@
 
 VS Code extension for php, using phpmd.
 
-# Todo
+## Config
 
-- 提高性能
+Default :
+
+	{
+		"phpmd.enabled": true,
+		"phpmd.validate.executablePath": "/usr/bin/phpmd",
+		"phpmd.validate.executablePath": "cleancode,codesize,controversial,design,naming,unusedcode"
+	}

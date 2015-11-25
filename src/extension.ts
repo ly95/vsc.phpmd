@@ -46,8 +46,9 @@ class PHPMD {
 	delayerHandler: number;
 	reportFormat = 'text';
 	matchExpression = /([a-zA-Z_\/\.]+):(\d+)	(.*)/;
-	diagnosticCollection: any;
+	diagnosticCollection: vscode.DiagnosticCollection;
 	enabled: boolean;
+	tmpStr = "";
 
 	constructor() {
 		this.init();
@@ -64,7 +65,9 @@ class PHPMD {
 		let section = vscode.workspace.getConfiguration("phpmd");
 		this.enabled = section.get('enabled', true);
 
-		this.runMode = section.get("validate.run_mode", RunMode.onSave);
+		// Not support now.
+		// this.runMode = section.get("validate.run_mode", RunMode.onSave);
+		this.runMode = RunMode.onSave;
 		this.executable = section.get("validate.executablePath", null);
 
 		let rulesets = section.get("validate.rulesets", Rulesets);
@@ -88,58 +91,85 @@ class PHPMD {
 		}
 		if (this.runMode === RunMode.onType) {
 			this.listener = vscode.workspace.onDidChangeTextDocument((e) => {
-				this.doValidate(e.document);
+				// Todo
+				// this.doValidate(e.document);
 			});
 		} else {
 			this.listener = vscode.workspace.onDidSaveTextDocument((e) => {
 				this.doValidate(e);
 			});
 		}
+
+		vscode.workspace.onDidCloseTextDocument(function(textDocument) {
+			_this.diagnosticCollection.delete(textDocument.uri);
+		}, null, context.subscriptions);
+
 		context.subscriptions.push(this);
 	}
 
 	doValidate(document: vscode.TextDocument) {
 		let _this = this;
-		if (document.isDirty || document.isUntitled) {
-			return;
-		}
 		if (document.languageId !== 'php') {
 			vscode.window.showInformationMessage("Only php files can be validate by phpmd.");
 			return;
 		}
 
-		let executablePath = this.executable || "phpmd";
-		let args = [];
-
-		args.push(document.uri.path);
-		args.push(this.reportFormat);
-		args.push(this.rulesets.join(","));
-
 		if (this.delayerHandler) {
 			clearTimeout(this.delayerHandler);
 		}
-		this.delayerHandler = setTimeout(function(executablePath: string, args: Array<string>) {
-			let options = {
-				'timeout': 60000
-			};
-			let commands = executablePath + " " + args.join(" ");
-			cp.exec(commands, options, function(error, stdout, stderr) {
-				let result = stdout.toString();
-				let diagnostics = [];
-				result.split("\n").forEach(element => {
-					let diagnostic = _this.parser(element);
-					if (diagnostic) {
-						diagnostics.push(diagnostic);
+
+		this.delayerHandler = setTimeout(function(document: vscode.TextDocument) {
+			let executablePath = _this.executable || "phpmd";
+			let args = [];
+
+			args.push(document.fileName);
+			args.push(_this.reportFormat);
+			args.push(_this.rulesets.join(","));
+
+			let diagnostics = new Array;
+
+			let exec = cp.spawn(executablePath, args);
+			exec.stdout.on('data', function(data: Buffer) {
+				let result = data.toString();
+				console.log('stdout: ' + result);
+				if (result === "\n") {
+					return;
+				}
+				_this.tmpStr += result;
+				do {
+					let lines = _this.tmpStr.split("\n");
+					let line = lines.shift();
+					_this.tmpStr = lines.join("\n");
+					let diagnostic = _this.parser(line);
+					if (diagnostic === null) {
+						break;
 					}
-				});
-				_this.diagnosticCollection.set(document.uri, diagnostics);
+					diagnostics.push(diagnostic);
+				} while (true);
 			});
-		}, 500, executablePath, args);
+			// exec.stderr.on('data', function(data) {
+			// 	console.log('stderr: ' + data);
+			// });
+			exec.on('close', function(code) {
+				// PHPMD's command line tool currently defines three different exit codes.
+				// 0, This exit code indicates that everything worked as expected. This means there was no error/exception and PHPMD hasn't detected any rule violation in the code under test.
+				// 1, This exit code indicates that an error/exception occured which has interrupted PHPMD during execution.
+				// 2, This exit code means that PHPMD has processed the code under test without the occurence of an error/exception, but it has detected rule violations in the analyzed source code.
+				// console.log('close: ' + code);
+				if (code > 0) {
+					// console.log("diagnostics.length " + diagnostics.length);
+					_this.diagnosticCollection.set(document.uri, diagnostics);
+					delete _this.tmpStr;
+					_this.tmpStr = "";
+				} else {
+					_this.diagnosticCollection.delete(document.uri);
+				}
+			});
+		}, 1000, document);
 	}
 
 	parser(line: string) {
 		let matches = line.match(this.matchExpression);
-		// console.log(matches);
 		if (matches) {
 			let message = "PHPMD: " + matches[3];
 			let line_no = parseInt(matches[2]) - 1;

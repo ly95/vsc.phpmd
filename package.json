@@ -26,13 +26,13 @@
 					"type": "string",
 					"default": null,
 					"description": "Points to the phpmd exectuable."
-				},
-				"phpmd.validate.run": {
-					"type": "string",
-					"enum": ["onSave", "onType"],
-					"default": "onSave",
-					"description": "Whether the linter is run on save or on type."
 				}
+				// "phpmd.validate.run": {
+				// 	"type": "string",
+				// 	"enum": ["onSave", "onType"],
+				// 	"default": "onSave",
+				// 	"description": "Whether the linter is run on save or on type."
+				// }
 			}
 		}
 	},

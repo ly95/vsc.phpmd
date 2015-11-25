@@ -71,8 +71,10 @@ class PHPMD {
 		this.executable = section.get("validate.executablePath", null);
 
 		let rulesets = section.get("validate.rulesets", Rulesets);
+		if (!rulesets) {
+			rulesets = Rulesets;
+		}
 		this.rulesets = new Array;
-
 		let tmp = rulesets.split(",");
 		for (let i = 0; i < tmp.length; i++) {
 			let element = tmp[i].trim();
@@ -103,13 +105,13 @@ class PHPMD {
 		vscode.workspace.onDidCloseTextDocument((e) => {
 			this.diagnosticCollection.delete(e.uri);
 		});
-
+		
 		context.subscriptions.push(this);
 	}
 
 	doValidate(document: vscode.TextDocument) {
 		if (document.languageId !== 'php') {
-			vscode.window.showInformationMessage("Only php files can be validate by phpmd.");
+			// vscode.window.showInformationMessage("Only php files can be validate by phpmd.");
 			return;
 		}
 
@@ -131,7 +133,7 @@ class PHPMD {
 
 			exec.stdout.on('data', (data: Buffer) => {
 				let result = data.toString();
-				console.log('stdout: ' + result);
+				// console.log('stdout: ' + result);
 				this.tmpStr += result;
 				do {
 					let lines = this.tmpStr.split("\n");

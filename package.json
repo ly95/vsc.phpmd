@@ -34,12 +34,6 @@
 					"default": null,
 					"description": "a comma-separated string of rulesetfilenames (cleancode,codesize,controversial,design,naming,unusedcode)"
 				}
-				// "phpmd.validate.run": {
-				// 	"type": "string",
-				// 	"enum": ["onSave", "onType"],
-				// 	"default": "onSave",
-				// 	"description": "Whether the linter is run on save or on type."
-				// }
 			}
 		}
 	},

@@ -100,15 +100,14 @@ class PHPMD {
 			});
 		}
 
-		vscode.workspace.onDidCloseTextDocument(function(textDocument) {
-			_this.diagnosticCollection.delete(textDocument.uri);
-		}, null, context.subscriptions);
+		vscode.workspace.onDidCloseTextDocument((e) => {
+			this.diagnosticCollection.delete(e.uri);
+		});
 
 		context.subscriptions.push(this);
 	}
 
 	doValidate(document: vscode.TextDocument) {
-		let _this = this;
 		if (document.languageId !== 'php') {
 			vscode.window.showInformationMessage("Only php files can be validate by phpmd.");
 			return;
@@ -118,39 +117,45 @@ class PHPMD {
 			clearTimeout(this.delayerHandler);
 		}
 
-		this.delayerHandler = setTimeout(function(document: vscode.TextDocument) {
-			let executablePath = _this.executable || "phpmd";
+		this.delayerHandler = setTimeout((document: vscode.TextDocument) => {
+			let executablePath = this.executable || "phpmd";
 			let args = [];
 
 			args.push(document.fileName);
-			args.push(_this.reportFormat);
-			args.push(_this.rulesets.join(","));
+			args.push(this.reportFormat);
+			args.push(this.rulesets.join(","));
 
 			let diagnostics = new Array;
 
 			let exec = cp.spawn(executablePath, args);
-			exec.stdout.on('data', function(data: Buffer) {
+
+			exec.stdout.on('data', (data: Buffer) => {
 				let result = data.toString();
 				console.log('stdout: ' + result);
-				if (result === "\n") {
-					return;
-				}
-				_this.tmpStr += result;
+				this.tmpStr += result;
 				do {
-					let lines = _this.tmpStr.split("\n");
+					let lines = this.tmpStr.split("\n");
 					let line = lines.shift();
-					_this.tmpStr = lines.join("\n");
-					let diagnostic = _this.parser(line);
+					if (lines.length) {
+						this.tmpStr = lines.join("\n");
+					} else {
+						this.tmpStr = "";
+						break;
+					}
+					if (!line.length) {
+						continue;
+					}
+					let diagnostic = this.parser(line);
 					if (diagnostic === null) {
 						break;
 					}
 					diagnostics.push(diagnostic);
 				} while (true);
 			});
-			// exec.stderr.on('data', function(data) {
+			// exec.stderr.on('data', (data: Buffer) => {
 			// 	console.log('stderr: ' + data);
 			// });
-			exec.on('close', function(code) {
+			exec.on('close', (code: number) => {
 				// PHPMD's command line tool currently defines three different exit codes.
 				// 0, This exit code indicates that everything worked as expected. This means there was no error/exception and PHPMD hasn't detected any rule violation in the code under test.
 				// 1, This exit code indicates that an error/exception occured which has interrupted PHPMD during execution.
@@ -158,11 +163,9 @@ class PHPMD {
 				// console.log('close: ' + code);
 				if (code > 0) {
 					// console.log("diagnostics.length " + diagnostics.length);
-					_this.diagnosticCollection.set(document.uri, diagnostics);
-					delete _this.tmpStr;
-					_this.tmpStr = "";
+					this.diagnosticCollection.set(document.uri, diagnostics);
 				} else {
-					_this.diagnosticCollection.delete(document.uri);
+					this.diagnosticCollection.delete(document.uri);
 				}
 			});
 		}, 1000, document);

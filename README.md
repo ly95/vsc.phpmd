@@ -9,5 +9,5 @@ Default :
 	{
 		"phpmd.enabled": true,
 		"phpmd.validate.executablePath": "/usr/bin/phpmd",
-		"phpmd.validate.executablePath": "cleancode,codesize,controversial,design,naming,unusedcode"
+		"phpmd.validate.rulesets": "cleancode,codesize,controversial,design,naming,unusedcode"
 	}

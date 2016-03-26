@@ -12,6 +12,18 @@
  */
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+
+/// Now, vscode is non support i18n.
+/// So, I was hard coding...
+/// TODO: add i18n-node dependencies and use.
+const LANG_SETS = {
+	'en_US': {
+		"no_executable": "Unable to locate phpmd. Please add phpmd to your global path."
+	}
+};
+const NOW_LANG = 'en_US';
 
 enum RunMode {
 	onSave,
@@ -34,6 +46,10 @@ enum Ruleset {
 };
 
 let Rulesets: string = "cleancode,codesize,controversial,design,naming,unusedcode";
+
+function showErrorMsg(msg: string): void {
+	vscode.window.showErrorMessage(`phpmd: ${msg}`);
+}
 
 /**
  * PHPMD
@@ -129,45 +145,52 @@ class PHPMD {
 
 			let diagnostics = new Array;
 
-			let exec = cp.spawn(executablePath, args);
-
-			exec.stdout.on('data', (data: Buffer) => {
-				let result = data.toString();
-				// console.log('stdout: ' + result);
-				this.tmpStr += result;
-				do {
-					let lines = this.tmpStr.split("\n");
-					let line = lines.shift();
-					if (lines.length) {
-						this.tmpStr = lines.join("\n");
-					} else {
-						this.tmpStr = "";
-						break;
-					}
-					if (!line.length) {
-						continue;
-					}
-					let diagnostic = this.parser(line);
-					if (diagnostic === null) {
-						break;
-					}
-					diagnostics.push(diagnostic);
-				} while (true);
-			});
-			// exec.stderr.on('data', (data: Buffer) => {
-			// 	console.log('stderr: ' + data);
-			// });
-			exec.on('close', (code: number) => {
-				// PHPMD's command line tool currently defines three different exit codes.
-				// 0, This exit code indicates that everything worked as expected. This means there was no error/exception and PHPMD hasn't detected any rule violation in the code under test.
-				// 1, This exit code indicates that an error/exception occured which has interrupted PHPMD during execution.
-				// 2, This exit code means that PHPMD has processed the code under test without the occurence of an error/exception, but it has detected rule violations in the analyzed source code.
-				// console.log('close: ' + code);
-				if (code > 0) {
-					// console.log("diagnostics.length " + diagnostics.length);
-					this.diagnosticCollection.set(document.uri, diagnostics);
+            const check_executable = cp.exec(`${executablePath} --version`, (error, stdout, stderr) => {
+				if (error) {
+					showErrorMsg(LANG_SETS[NOW_LANG]["no_executable"]);
 				} else {
-					this.diagnosticCollection.delete(document.uri);
+					let exec = cp.spawn(executablePath, args);
+
+					exec.stdout.on('data', (data: Buffer) => {
+						let result = data.toString();
+						// console.log('stdout: ' + result);
+						this.tmpStr += result;
+						do {
+							let lines = this.tmpStr.split("\n");
+							let line = lines.shift();
+							if (lines.length) {
+								this.tmpStr = lines.join("\n");
+							} else {
+								this.tmpStr = "";
+								break;
+							}
+							if (!line.length) {
+								continue;
+							}
+							let diagnostic = this.parser(line);
+							if (diagnostic === null) {
+								break;
+							}
+							diagnostics.push(diagnostic);
+						} while (true);
+					});
+					
+					// exec.stderr.on('data', (data: Buffer) => {
+					// 	console.log('stderr: ' + data);
+					// });
+					exec.on('close', (code: number) => {
+						// PHPMD's command line tool currently defines three different exit codes.
+						// 0, This exit code indicates that everything worked as expected. This means there was no error/exception and PHPMD hasn't detected any rule violation in the code under test.
+						// 1, This exit code indicates that an error/exception occured which has interrupted PHPMD during execution.
+						// 2, This exit code means that PHPMD has processed the code under test without the occurence of an error/exception, but it has detected rule violations in the analyzed source code.
+						// console.log('close: ' + code);
+						if (code > 0) {
+							// console.log("diagnostics.length " + diagnostics.length);
+							this.diagnosticCollection.set(document.uri, diagnostics);
+						} else {
+							this.diagnosticCollection.delete(document.uri);
+						}
+					});
 				}
 			});
 		}, 1000, document);

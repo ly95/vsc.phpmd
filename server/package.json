@@ -1,0 +1,20 @@
+{
+	"name": "phpmd",
+	"description": "VS Code extension for php, using phpmd.",
+    "engines": {
+		"node": "*"
+	},
+	"version": "1.0.0",
+	"author": "Yang Lin",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"dependencies": {
+		"vscode-languageserver": "^1.1.0"
+	},
+	"devDependencies": {
+		"typescript": "^1.6.2"
+	},
+	"scripts": {
+		"compile": "node ./node_modules/vscode-languageserver/bin/installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+		"watch": "node ./node_modules/vscode-languageserver/bin/installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
+	}
+}

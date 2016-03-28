@@ -1,10 +1,17 @@
 {
 	"name": "phpmd",
 	"description": "VS Code extension for php, using phpmd.",
-	"version": "0.3.1",
+	"author": "Yang Lin",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"homepage": "https://github.com/ly95/vsc.phpmd",
+	"bugs": {
+		"url": "https://github.com/ly95/vsc.phpmd/issues",
+		"email": "linyang95@aol.com"
+	},
+	"version": "1.0.0",
 	"publisher": "linyang95",
 	"engines": {
-		"vscode": "^0.10.1"
+		"vscode": "0.10.x"
 	},
 	"categories": [
 		"Linters",
@@ -16,8 +23,8 @@
 	"main": "./out/src/extension",
 	"contributes": {
 		"configuration": {
-			"title": "PHPMD Configuration options",
 			"type": "object",
+			"title": "PHPMD Configuration options",
 			"properties": {
 				"phpmd.enabled": {
 					"type": "boolean",
@@ -26,12 +33,12 @@
 				},
 				"phpmd.validate.executablePath": {
 					"type": "string",
-					"default": null,
+					"default": "",
 					"description": "Points to the phpmd exectuable."
 				},
 				"phpmd.validate.rulesets": {
 					"type": "string",
-					"default": null,
+					"default": "cleancode,codesize,controversial,design,naming,unusedcode",
 					"description": "a comma-separated string of rulesetfilenames (cleancode,codesize,controversial,design,naming,unusedcode)"
 				}
 			}
@@ -41,12 +48,6 @@
 		"phpmd",
 		"php"
 	],
-	"license": "SEE LICENSE IN LICENSE.md",
-	"homepage": "https://github.com/ly95/vsc.phpmd",
-	"bugs": {
-        "url": "https://github.com/ly95/vsc.phpmd/issues",
-        "email": "linyang95@aol.com"
-    },
 	"scripts": {
 		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
 		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
@@ -54,5 +55,8 @@
 	"devDependencies": {
 		"typescript": "^1.6.2",
 		"vscode": "0.10.x"
+	},
+	"dependencies": {
+		"vscode-languageclient": "^1.1.0"
 	}
 }

@@ -51,6 +51,19 @@ function showErrorMsg(msg: string): void {
 	vscode.window.showErrorMessage(`phpmd: ${msg}`);
 }
 
+function canResolveJsonPath(o: any, ...keys: string[]): boolean {
+	let obj = o;
+	for(let key of keys) {
+		if (o[key]) {
+			o = o[key];
+		} else {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 /**
  * PHPMD
  */
@@ -72,7 +85,7 @@ class PHPMD {
 
 	dispose() {
 		this.diagnosticCollection.clear();
-        this.diagnosticCollection.dispose();
+		this.diagnosticCollection.dispose();
 	}
 
 	init() {
@@ -124,6 +137,27 @@ class PHPMD {
 		
 		context.subscriptions.push(this);
 	}
+	
+	static executablePath() {
+		const rootPath = vscode.workspace.rootPath;
+		
+		const composerConfPath = path.join(rootPath, 'composer.json');
+		if (fs.existsSync(composerConfPath)) {
+			const composerConf = JSON.parse(fs.readFileSync(composerConfPath, 'utf-8'));
+			
+			if (   canResolveJsonPath(composerConf, 'require', 'phpmd/phpmd')
+				|| canResolveJsonPath(composerConf, 'require-dev', 'phpmd/phpmd')
+			) {
+				const composerPhpmdPath = path.join(rootPath, 'vendor', 'bin', 'phpmd');
+				
+				if (fs.existsSync(composerPhpmdPath)) {
+					return composerPhpmdPath;
+				}
+			}
+		}
+		
+		return 'phpmd';
+	}
 
 	doValidate(document: vscode.TextDocument) {
 		if (document.languageId !== 'php') {
@@ -136,7 +170,7 @@ class PHPMD {
 		}
 
 		this.delayerHandler = setTimeout((document: vscode.TextDocument) => {
-			let executablePath = this.executable || "phpmd";
+			const executablePath = this.executable || PHPMD.executablePath();
 			let args = [];
 
 			args.push(document.fileName);
@@ -145,7 +179,7 @@ class PHPMD {
 
 			let diagnostics = new Array;
 
-            const check_executable = cp.exec(`${executablePath} --version`, (error, stdout, stderr) => {
+			const check_executable = cp.exec(`${executablePath} --version`, (error, stdout, stderr) => {
 				if (error) {
 					showErrorMsg(LANG_SETS[NOW_LANG]["no_executable"]);
 				} else {

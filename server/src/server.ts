@@ -62,10 +62,9 @@ documents.onDidChangeContent((change) => {
 connection.onDidChangeConfiguration((change) => {
     let settings = <Settings>change.settings;
 
-    maxNumberOfProblems = settings.phpmd.maxNumberOfProblems || 2;
+    maxNumberOfProblems = settings.phpmd.maxNumberOfProblems || 100;
     executablePath = settings.phpmd.validate.executablePath || 'phpmd';
     enabled = settings.phpmd.enabled;
-    // connection.console.log('enabled=' + enabled);
 
     rulesets = settings.phpmd.validate.rulesets;
 
@@ -119,12 +118,11 @@ function validatePhpDocument(textDocument: ITextDocument): void {
 
     exec.stdout.on('data', (data: Buffer) => {
 
-        if (diagnostics.length > maxNumberOfProblems) {
+        if (maxNumberOfProblems && diagnostics.length > maxNumberOfProblems) {
             return;
         }
 
         response += data.toString();
-        // connection.console.log(response);
         do {
             let lines = response.split("\n");
             let line = lines.shift();

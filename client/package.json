@@ -4,11 +4,12 @@
 	"author": "Yang Lin",
 	"license": "SEE LICENSE IN LICENSE.md",
 	"homepage": "https://github.com/ly95/vsc.phpmd",
+    "icon": "images/icon.svg",
 	"bugs": {
 		"url": "https://github.com/ly95/vsc.phpmd/issues",
 		"email": "linyang95@aol.com"
 	},
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "linyang95",
 	"engines": {
 		"vscode": "0.10.x"

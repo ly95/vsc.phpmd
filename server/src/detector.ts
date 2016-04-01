@@ -37,7 +37,7 @@ export function checkComposerExecutable(rootPath: string): Thenable<string | boo
 			const composerConf = JSON.parse(fs.readFileSync(composerConfPath, 'utf-8'));
 			const pkgName = 'phpmd/phpmd';
 
-			if (   canResolveJsonPath(composerConf, 'require', pkgName)
+			if (canResolveJsonPath(composerConf, 'require', pkgName)
 				|| canResolveJsonPath(composerConf, 'require-dev', pkgName)
 			) {
 				const composerPhpmdPath = path.join(rootPath, 'vendor', 'bin', 'phpmd');
@@ -65,7 +65,7 @@ export function resolveExecPath(rootPath: string, executablePath?: string): Then
 						const noexecStr = langsets.format(
 							langsets.getLangSet().no_executable,
 							executablePath
-							);
+						);
 						reject2(noexecStr);
 					}
 				}));

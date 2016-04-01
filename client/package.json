@@ -34,7 +34,7 @@
 				},
 				"phpmd.validate.executablePath": {
 					"type": "string",
-					"default": "",
+					"default": "phpmd",
 					"description": "Points to the phpmd exectuable."
 				},
 				"phpmd.validate.rulesets": {

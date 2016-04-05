@@ -9,7 +9,7 @@
 		"url": "https://github.com/ly95/vsc.phpmd/issues",
 		"email": "linyang95@aol.com"
 	},
-	"version": "1.1.0",
+	"version": "1.1.2",
 	"publisher": "linyang95",
 	"engines": {
 		"vscode": "0.10.x"
@@ -34,7 +34,7 @@
 				},
 				"phpmd.validate.executablePath": {
 					"type": "string",
-					"default": "phpmd",
+					"default": "",
 					"description": "Points to the phpmd exectuable."
 				},
 				"phpmd.validate.rulesets": {

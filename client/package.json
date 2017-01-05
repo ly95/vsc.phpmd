@@ -41,6 +41,11 @@
 					"type": "string",
 					"default": "cleancode,codesize,controversial,design,naming,unusedcode",
 					"description": "a comma-separated string of rulesetfilenames (cleancode,codesize,controversial,design,naming,unusedcode)"
+				},
+				"phpmd.validate.rulesetsFile": {
+					"type": "string",
+					"default": "",
+					"description": "Points to the phpmd ruleset config file."
 				}
 			}
 		}

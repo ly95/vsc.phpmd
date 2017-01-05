@@ -23,7 +23,8 @@ interface Settings {
 		enabled: boolean,
 		validate: {
 			executablePath: string,
-			rulesets: string
+			rulesets: string,
+			rulesetsFile: string
 		}
 	}
 }
@@ -44,6 +45,7 @@ let maxNumberOfProblems: number;
 let executablePath: string = undefined;
 let executablePathSetting: string;
 let rulesets: string;
+let rulesetsFile: string;
 let enabled: boolean;
 
 let matchExpression = /([a-zA-Z_\/\.]+):(\d+)	(.*)/;
@@ -78,16 +80,21 @@ connection.onDidChangeConfiguration((change) => {
 	enabled = settings.phpmd.enabled;
 
 	rulesets = settings.phpmd.validate.rulesets;
+	rulesetsFile = settings.phpmd.validate.rulesetsFile;
 
-	let temp = [];
-	if ((rulesets || '').length > 0) {
-		rulesets.split(',').forEach((elem) => {
-			if (PhpmdRulesets.indexOf(elem) >= 0) {
-				temp.push(elem);
-			}
-		});
+	if (rulesetsFile.length > 0) {
+		rulesets = rulesetsFile;
+	} else {
+		let temp = [];
+		if ((rulesets || '').length > 0) {
+			rulesets.split(',').forEach((elem) => {
+				if (PhpmdRulesets.indexOf(elem) >= 0) {
+					temp.push(elem);
+				}
+			});
+		}
+		rulesets = (temp.length > 0 ? temp : PhpmdRulesets).join(',');
 	}
-	rulesets = (temp.length > 0 ? temp : PhpmdRulesets).join(',');
 
 	documents.all().forEach(validatePhpDocument);
 });

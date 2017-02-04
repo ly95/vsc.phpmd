@@ -8,13 +8,14 @@
   "author": "Yang Lin",
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
-    "vscode-languageserver": "^1.1.0"
+    "vscode-languageserver": "^3.0.4"
   },
   "devDependencies": {
-    "typescript": "^1.6.2"
+    "@types/node": "^6.0.52",
+    "typescript": "^2.1.5"
   },
   "scripts": {
-    "compile": "node ./node_modules/vscode-languageserver/bin/installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
-    "watch": "node ./node_modules/vscode-languageserver/bin/installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
+    "compile": "${workspaceRoot}node_modules/.bin/installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+    "watch": "${workspaceRoot}node_modules/.bin/installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
   }
 }

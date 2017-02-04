@@ -3,7 +3,7 @@
 import {
 	IPCMessageReader, IPCMessageWriter,
 	createConnection, IConnection, TextDocumentSyncKind,
-	TextDocuments, ITextDocument, Diagnostic, DiagnosticSeverity,
+	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	InitializeParams, InitializeResult, TextDocumentIdentifier,
 	CompletionItem, CompletionItemKind, Files
 } from 'vscode-languageserver';
@@ -131,7 +131,7 @@ function resolveExecutablePath(): Thenable<void> {
 		});
 }
 
-function validatePhpDocument(textDocument: ITextDocument): void {
+function validatePhpDocument(textDocument: TextDocument): void {
 
 	if (!enabled) {
 		return;
@@ -158,7 +158,7 @@ function validatePhpDocument(textDocument: ITextDocument): void {
 
 		exec.stdout.on('data', (data: Buffer) => {
 
-	   		if (maxNumberOfProblems && diagnostics.length > maxNumberOfProblems) {
+			if (maxNumberOfProblems && diagnostics.length > maxNumberOfProblems) {
 				return;
 			}
 
@@ -167,11 +167,11 @@ function validatePhpDocument(textDocument: ITextDocument): void {
 				let lines = response.split("\n");
 				let line = lines.shift();
 				if (lines.length) {
-			   		response = lines.join("\n");
+					response = lines.join("\n");
 				} else {
 					response = '';
 					break;
-		   		}
+				}
 				if (!line.length) {
 					continue;
 				}

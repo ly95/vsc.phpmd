@@ -17,7 +17,7 @@ function canResolveJsonPath(o: any, ...keys: string[]): boolean {
 	return true;
 }
 
-export function checkExecutable(executablePath: string): Thenable<boolean> {
+export function checkExecutable(executablePath: string|boolean): Thenable<boolean> {
 	return new Promise<boolean>((resolve, reject) => {
 		cp.exec(`${executablePath} --version`, (error, stdout, stderr) => {
 			if (error) {
@@ -70,16 +70,17 @@ export function resolveExecPath(rootPath: string, executablePath?: string): Then
 					}
 				}));
 		} else {
-			resPathP = checkComposerExecutable(rootPath).then(r => {
-				if (typeof r === 'string') {
-					return r;
-				} else {
-					return 'phpmd';
-				}
-			})
+			resPathP = checkComposerExecutable(rootPath)
+				.then(r => {
+					if (typeof r === 'string') {
+						return r;
+					} else {
+						return 'phpmd';
+					}
+				})
 				.then(pathName => checkExecutable(pathName)
 					.then(b => new Promise<string>((resolve2, reject2) => {
-						if (b) {
+						if (b && typeof pathName === 'string') {
 							resolve2(pathName);
 						} else {
 							reject2(langsets.getLangSet().unable_locate);

@@ -58,10 +58,7 @@ connection.onInitialize((params): InitializeResult => {
 	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
-			textDocumentSync: documents.syncKind,
-			completionProvider: {
-				resolveProvider: false
-			}
+			textDocumentSync: documents.syncKind
 		}
 	}
 });

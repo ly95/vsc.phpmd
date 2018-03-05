@@ -4,18 +4,19 @@
   "engines": {
     "node": "*"
   },
-  "version": "1.0.0",
+  "version": "1.2.0",
   "author": "Yang Lin",
-  "license": "SEE LICENSE IN LICENSE.md",
-  "dependencies": {
-    "vscode-languageserver": "^3.0.4"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ly95/vsc.phpmd"
   },
-  "devDependencies": {
-    "@types/node": "^6.0.52",
-    "typescript": "^2.1.5"
+  "dependencies": {
+    "vscode-languageserver": "^3.5.0"
   },
   "scripts": {
-    "compile": "${workspaceRoot}node_modules/.bin/installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
-    "watch": "${workspaceRoot}node_modules/.bin/installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
+    "installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",
+    "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+    "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p ."
   }
 }

@@ -1,19 +1,14 @@
 'use strict';
 
 import {
-	IPCMessageReader, IPCMessageWriter,
-	createConnection, IConnection, TextDocumentSyncKind,
-	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
-	InitializeParams, InitializeResult, TextDocumentIdentifier,
-	CompletionItem, CompletionItemKind, Files
+	IPCMessageReader, IPCMessageWriter, createConnection,
+	IConnection, TextDocuments, TextDocument,
+	Diagnostic, DiagnosticSeverity, InitializeResult, Files
 } from 'vscode-languageserver';
-import * as cp from 'child_process';
-
 import * as logger from './logger';
 import * as langsets from './langsets';
-import {
-	resolveExecPath
-} from './detector';
+import { resolveExecPath } from './detector';
+import * as cp from 'child_process';
 
 langsets.use('en_US');
 
@@ -82,7 +77,7 @@ connection.onDidChangeConfiguration((change) => {
 	if (rulesetsFile.length > 0) {
 		rulesets = rulesetsFile;
 	} else {
-		let temp = [];
+		var temp: string[];
 		if ((rulesets || '').length > 0) {
 			rulesets.split(',').forEach((elem) => {
 				if (PhpmdRulesets.indexOf(elem) >= 0) {
@@ -143,7 +138,7 @@ function validatePhpDocument(textDocument: TextDocument): void {
 		rulesets
 	];
 
-	new Promise<string>((resolve, reject) => {
+	new Promise<string>((resolve) => {
 		if (executablePath === undefined) {
 			resolve(resolveExecutablePath().then(() => executablePath));
 		} else {

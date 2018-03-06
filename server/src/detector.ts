@@ -14,17 +14,6 @@ function canResolveJsonPath(o: any, ...keys: string[]): boolean {
 	return true;
 }
 
-export function checkExecutable(executablePath: string|boolean): Thenable<boolean> {
-	return new Promise<boolean>((resolve) => {
-		cp.exec(`${executablePath} --version`, (error) => {
-			if (error) {
-				resolve(false);
-			}
-			resolve(true);
-		});
-	});
-}
-
 export function checkComposerExecutable(rootPath: string): Thenable<string | boolean> {
 	return new Promise<string | boolean>((resolve) => {
 		const composerConfPath = path.join(rootPath, 'composer.json');
@@ -50,41 +39,24 @@ export function checkComposerExecutable(rootPath: string): Thenable<string | boo
 
 export function resolveExecPath(rootPath: string, executablePath?: string): Thenable<string> {
 	return new Promise<string>((resolve) => {
-		let resPathP: Thenable<any>;
-
 		if (executablePath !== undefined) {
-			resPathP = checkExecutable(executablePath)
-				.then(b => new Promise<string>((resolve2, reject2) => {
-					if (b) {
-						resolve2(executablePath);
-					} else {
-						const noexecStr = langsets.format(
-							langsets.getLangSet().no_executable,
-							executablePath
-						);
-						reject2(noexecStr);
-					}
-				}));
-		} else {
-			resPathP = checkComposerExecutable(rootPath)
-				.then(r => {
-					if (typeof r === 'string') {
-						return r;
-					} else {
-						return 'phpmd';
-					}
-				})
-				.then(pathName => checkExecutable(pathName)
-					.then(b => new Promise<string>((resolve2, reject2) => {
-						if (b && typeof pathName === 'string') {
-							resolve2(pathName);
-						} else {
-							reject2(langsets.getLangSet().unable_locate);
-						}
-					}))
-				);
+			return resolve(executablePath);
+		} else if (rootPath !== undefined) {
+			return checkComposerExecutable(rootPath).then(r => {
+				resolve(typeof r === 'string' ? r : 'phpmd');
+			})
 		}
+		resolve("phpmd")
+	}).then(r => {
+		return new Promise<string>((resolve, reject) => {
+			cp.exec(`${r} --version`, (error) => {
+				if (error) {
+					reject(langsets.getLangSet().unable_locate);
+				} else {
+					resolve(r);
+				}
+			});
+		});
+	}).catch();
 
-		resolve(resPathP);
-	});
 }

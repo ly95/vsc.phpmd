@@ -50,7 +50,7 @@ logger.configure(connection);
 documents.listen(connection);
 
 connection.onInitialize((params): InitializeResult => {
-	workspaceRoot = params.rootPath;
+	workspaceRoot = params.rootPath || undefined;
 	return {
 		capabilities: {
 			textDocumentSync: documents.syncKind
@@ -67,7 +67,6 @@ connection.onDidChangeConfiguration((change) => {
 
 	maxNumberOfProblems = settings.phpmd.maxNumberOfProblems || 100;
 	executablePathSetting = settings.phpmd.validate.executablePath;
-	resolveExecutablePath();
 
 	enabled = settings.phpmd.enabled;
 
@@ -77,7 +76,7 @@ connection.onDidChangeConfiguration((change) => {
 	if (rulesetsFile.length > 0) {
 		rulesets = rulesetsFile;
 	} else {
-		var temp: string[];
+		var temp: string[] = [];
 		if ((rulesets || '').length > 0) {
 			rulesets.split(',').forEach((elem) => {
 				if (PhpmdRulesets.indexOf(elem) >= 0) {
@@ -139,13 +138,8 @@ function validatePhpDocument(textDocument: TextDocument): void {
 	];
 
 	new Promise<string>((resolve) => {
-		if (executablePath === undefined) {
-			resolve(resolveExecutablePath().then(() => executablePath));
-		} else {
-			resolve(executablePath);
-		}
+		resolve(resolveExecutablePath().then(() => executablePath));
 	}).then(execPath => {
-
 		let exec = cp.spawn(execPath, args);
 
 		exec.stdout.on('data', (data: Buffer) => {
@@ -188,5 +182,9 @@ function validatePhpDocument(textDocument: TextDocument): void {
 				connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 			}
 		});
+	}, e => {
+		connection.console.error("phpmd: " + e);
+	}).catch((error) => {
+		console.log(error);
 	});
 }

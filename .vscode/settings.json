@@ -1,0 +1,13 @@
+{
+    "files.exclude": {
+        "client/out/**/*": false,
+        "client/server/**/*": false,
+        "client/node_modules": false,
+        "server/node_modules": false
+    },
+    "search.exclude": {
+        "out": true
+    },
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "typescript.tsc.autoDetect": "off"
+}

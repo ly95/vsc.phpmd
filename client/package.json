@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/ly95/vsc.phpmd"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "linyang95",
   "engines": {
     "vscode": "^1.16.0"

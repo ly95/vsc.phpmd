@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 
-import { workspace, Disposable, ExtensionContext } from 'vscode';
+import { workspace, Disposable, ExtensionContext, window } from 'vscode';
 import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions, TransportKind } from 'vscode-languageclient';
 
 export function activate(context: ExtensionContext) {
@@ -15,6 +15,11 @@ export function activate(context: ExtensionContext) {
         debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
     }
 
+    if (process.platform === 'win32') {
+        window.showErrorMessage("The phpmd is not supported on Windows yet.");
+        return;
+	}
+
     let clientOptions: LanguageClientOptions = {
         documentSelector: ['php'],
         synchronize: {
@@ -24,6 +29,5 @@ export function activate(context: ExtensionContext) {
     }
 
     let disposable = new LanguageClient('phpmd', serverOptions, clientOptions).start();
-
     context.subscriptions.push(disposable);
 }

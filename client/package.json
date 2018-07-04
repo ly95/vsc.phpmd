@@ -4,7 +4,7 @@
   "author": "Yang Lin",
   "license": "MIT",
   "homepage": "https://github.com/ly95/vsc.phpmd",
-  "icon": "images/icon.svg",
+  "icon": "images/icon.png",
   "bugs": {
     "url": "https://github.com/ly95/vsc.phpmd/issues",
     "email": "linyang95@aol.com"
@@ -19,8 +19,8 @@
     "vscode": "^1.16.0"
   },
   "categories": [
-    "Linters",
-    "Languages"
+    "Programming Languages",
+    "Linters"
   ],
   "keywords": [
     "phpmd",
